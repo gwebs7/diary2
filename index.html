@@ -27,7 +27,8 @@
         <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md">
-                    <i data-lucide="cloud-lightning" class="w-5 h-5"></i>
+                    <!-- 아이콘을 감싸는 wrapper를 활용하여 SVG 속성 충돌 방지 -->
+                    <span id="header-logo-icon" class="flex items-center justify-center"><i data-lucide="cloud-lightning" class="w-5 h-5"></i></span>
                 </div>
                 <div>
                     <h1 class="text-lg font-bold tracking-tight text-slate-900">하루기록</h1>
@@ -54,7 +55,7 @@
             <div class="bg-slate-900 text-white rounded-2xl p-5 shadow-xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h3 class="font-bold text-sm text-indigo-400 flex items-center space-x-1.5">
-                        <i data-lucide="cpu" class="w-4 h-4"></i>
+                        <span class="flex items-center"><i data-lucide="cpu" class="w-4 h-4"></i></span>
                         <span>Firebase 클라우드 실시간 모니터</span>
                     </h3>
                     <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">DEBUG MODE</span>
@@ -63,36 +64,36 @@
                 <!-- 점검 단계 목록 -->
                 <div class="space-y-3 text-xs">
                     <!-- 단계 1: Config 입력 여부 -->
-                    <div class="flex items-center justify-between" id="chk-config">
+                    <div class="flex items-center justify-between py-1" id="chk-config">
                         <div class="flex items-center space-x-2">
-                            <i data-lucide="circle-dashed" class="w-4 h-4 text-slate-500 step-icon"></i>
+                            <span class="step-icon-wrapper flex items-center text-slate-500"><i data-lucide="circle-dashed" class="w-4 h-4"></i></span>
                             <span class="text-slate-300">1. 코드 내 Config 입력 상태</span>
                         </div>
                         <span class="font-mono text-[11px] text-slate-400 step-status">대기 중</span>
                     </div>
 
                     <!-- 단계 2: Firebase 앱 초기화 -->
-                    <div class="flex items-center justify-between" id="chk-init">
+                    <div class="flex items-center justify-between py-1" id="chk-init">
                         <div class="flex items-center space-x-2">
-                            <i data-lucide="circle-dashed" class="w-4 h-4 text-slate-500 step-icon"></i>
+                            <span class="step-icon-wrapper flex items-center text-slate-500"><i data-lucide="circle-dashed" class="w-4 h-4"></i></span>
                             <span class="text-slate-300">2. Firebase SDK 초기화</span>
                         </div>
                         <span class="font-mono text-[11px] text-slate-400 step-status">대기 중</span>
                     </div>
 
                     <!-- 단계 3: 익명 로그인 인증 -->
-                    <div class="flex items-center justify-between" id="chk-auth">
+                    <div class="flex items-center justify-between py-1" id="chk-auth">
                         <div class="flex items-center space-x-2">
-                            <i data-lucide="circle-dashed" class="w-4 h-4 text-slate-500 step-icon"></i>
+                            <span class="step-icon-wrapper flex items-center text-slate-500"><i data-lucide="circle-dashed" class="w-4 h-4"></i></span>
                             <span class="text-slate-300">3. Authentication 인증 획득</span>
                         </div>
                         <span class="font-mono text-[11px] text-slate-400 step-status">대기 중</span>
                     </div>
 
                     <!-- 단계 4: 데이터베이스 쓰기/읽기 권한 -->
-                    <div class="flex items-center justify-between" id="chk-db">
+                    <div class="flex items-center justify-between py-1" id="chk-db">
                         <div class="flex items-center space-x-2">
-                            <i data-lucide="circle-dashed" class="w-4 h-4 text-slate-500 step-icon"></i>
+                            <span class="step-icon-wrapper flex items-center text-slate-500"><i data-lucide="circle-dashed" class="w-4 h-4"></i></span>
                             <span class="text-slate-300">4. Firestore 데이터 접속 (규칙)</span>
                         </div>
                         <span class="font-mono text-[11px] text-slate-400 step-status">대기 중</span>
@@ -102,7 +103,7 @@
                 <!-- 🚨 검출된 에러 및 해결방법 지시등 -->
                 <div id="diagnose-box" class="hidden pt-3 border-t border-slate-800 text-xs text-rose-300 bg-rose-950/30 p-3 rounded-lg border border-rose-900/50">
                     <div class="flex items-start space-x-2">
-                        <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 text-rose-400 mt-0.5"></i>
+                        <span class="flex items-center text-rose-400 mt-0.5"><i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i></span>
                         <div class="space-y-1">
                             <p class="font-bold text-rose-200" id="diagnose-summary">에러가 검출되었습니다</p>
                             <p class="text-[11px] text-slate-400 font-mono break-all leading-tight" id="diagnose-raw-err"></p>
@@ -118,7 +119,7 @@
             <div class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center space-x-2">
-                        <span class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
+                        <span class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg flex items-center">
                             <i data-lucide="pen-tool" class="w-4 h-4"></i>
                         </span>
                         <h2 class="font-bold text-slate-900" id="form-title">오늘의 기록</h2>
@@ -179,7 +180,7 @@
                     </div>
 
                     <button type="submit" id="btn-submit" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-medium text-sm transition-all duration-150 flex items-center justify-center space-x-2 shadow-sm">
-                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span class="flex items-center"><i data-lucide="plus-circle" class="w-4 h-4"></i></span>
                         <span>기록 남기기</span>
                     </button>
                 </form>
@@ -191,7 +192,7 @@
             <!-- 검색 / 필터바 -->
             <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="relative flex-grow">
-                    <span class="absolute left-3.5 top-2.5 text-slate-400">
+                    <span class="absolute left-3.5 top-2.5 text-slate-400 flex items-center">
                         <i data-lucide="search" class="w-4 h-4"></i>
                     </span>
                     <input type="text" id="search-input" placeholder="일기 검색..." class="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 rounded-xl border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all">
@@ -223,7 +224,7 @@
 
                 <div id="empty-state" class="hidden py-20 text-center flex flex-col items-center justify-center">
                     <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-4">
-                        <i data-lucide="book-heart" class="w-8 h-8"></i>
+                        <span class="flex items-center"><i data-lucide="book-heart" class="w-8 h-8"></i></span>
                     </div>
                     <h3 class="font-bold text-slate-700 text-base">저장된 기록이 없습니다</h3>
                     <p class="text-sm text-slate-400 mt-1 max-w-xs mx-auto">실시간 클라우드가 켜지면 브라우저 캐시를 삭제해도 일기가 안전하게 유지됩니다!</p>
@@ -236,7 +237,7 @@
 
     <!-- 사용자 알림 토스트 -->
     <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs font-semibold py-3 px-6 rounded-full shadow-2xl opacity-0 translate-y-4 transition-all duration-300 pointer-events-none z-50 flex items-center space-x-2">
-        <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i>
+        <span class="flex items-center text-indigo-400"><i data-lucide="info" class="w-4 h-4"></i></span>
         <span id="toast-message">메시지</span>
     </div>
 
@@ -261,7 +262,7 @@
             storageBucket: "test-7d850.firebasestorage.app",
             messagingSenderId: "440314204113",
             appId: "1:440314204113:web:eee03ea11493c8f9e6daf0"
-        };
+                   };
 
         // 전역 상태 관리
         let db = null;
@@ -475,28 +476,42 @@ service cloud.firestore {
             );
         }
 
-        // 자가진단 각 단계 UI 상태 세팅
+        /**
+         * BUG FIXED: markStep
+         * SVG 요소의 className은 직접 대입할 수 없으므로, classList 또는 setAttribute('class', ...)를 사용하여
+         * 에러 없이 동적으로 스타일 상태가 업데이트되도록 변경했습니다.
+         */
         function markStep(element, status, text) {
-            const icon = element.querySelector('.step-icon');
+            const iconWrapper = element.querySelector('.step-icon-wrapper');
             const statusLabel = element.querySelector('.step-status');
             
+            if (!iconWrapper || !statusLabel) return;
+
+            // 아이콘 래퍼 안의 마크업을 Lucide 데이터 상태에 맞게 교체하여 SVG 에러 원천 차단
             if (status === 'success') {
-                icon.className = "w-4 h-4 text-emerald-500 step-icon";
-                icon.setAttribute('data-lucide', 'check-circle-2');
-                statusLabel.className = "font-bold text-[11px] text-emerald-400 step-status";
+                iconWrapper.setAttribute('class', 'step-icon-wrapper flex items-center text-emerald-500');
+                iconWrapper.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4"></i>`;
+                
+                statusLabel.setAttribute('class', 'font-bold text-[11px] text-emerald-400 step-status');
                 statusLabel.innerText = text;
             } else if (status === 'fail') {
-                icon.className = "w-4 h-4 text-rose-500 step-icon";
-                icon.setAttribute('data-lucide', 'x-circle');
-                statusLabel.className = "font-bold text-[11px] text-rose-500 step-status";
+                iconWrapper.setAttribute('class', 'step-icon-wrapper flex items-center text-rose-500');
+                iconWrapper.innerHTML = `<i data-lucide="x-circle" class="w-4 h-4"></i>`;
+                
+                statusLabel.setAttribute('class', 'font-bold text-[11px] text-rose-500 step-status');
                 statusLabel.innerText = text;
             } else if (status === 'loading') {
-                icon.className = "w-4 h-4 text-amber-500 animate-spin step-icon";
-                icon.setAttribute('data-lucide', 'loader-2');
-                statusLabel.className = "font-bold text-[11px] text-amber-400 step-status";
+                iconWrapper.setAttribute('class', 'step-icon-wrapper flex items-center text-amber-500');
+                iconWrapper.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>`;
+                
+                statusLabel.setAttribute('class', 'font-bold text-[11px] text-amber-400 step-status');
                 statusLabel.innerText = text;
             }
-            lucide.createIcons();
+            
+            // Lucide 아이콘 다시 그리기
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         }
 
         // 실시간 진단창 노출
@@ -569,10 +584,10 @@ service cloud.firestore {
                             </div>
                         </div>
                         <div class="flex items-center space-x-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="editEntry('${entry.id}')" class="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-colors" title="수정">
+                            <button onclick="editEntry('${entry.id}')" class="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-colors flex items-center" title="수정">
                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                             </button>
-                            <button onclick="deleteEntry('${entry.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-slate-50 rounded-lg transition-colors" title="삭제">
+                            <button onclick="deleteEntry('${entry.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-slate-50 rounded-lg transition-colors flex items-center" title="삭제">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                         </div>
@@ -639,7 +654,7 @@ service cloud.firestore {
                 handleDbPermissionError(err);
             } finally {
                 btnSubmit.disabled = false;
-                btnSubmit.innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4"></i><span>기록 남기기</span>`;
+                btnSubmit.innerHTML = `<span class="flex items-center"><i data-lucide="plus-circle" class="w-4 h-4"></i></span><span>기록 남기기</span>`;
                 lucide.createIcons();
             }
         });
@@ -679,7 +694,7 @@ service cloud.firestore {
             }
 
             formTitle.innerText = "기록 수정하기";
-            btnSubmit.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i><span>수정 완료</span>`;
+            btnSubmit.innerHTML = `<span class="flex items-center"><i data-lucide="check-circle" class="w-4 h-4"></i></span><span>수정 완료</span>`;
             btnCancelEdit.classList.remove('hidden');
 
             window.scrollTo({
@@ -698,7 +713,7 @@ service cloud.firestore {
             setupMoodSelector();
 
             formTitle.innerText = "오늘의 기록";
-            btnSubmit.innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4"></i><span>기록 남기기</span>`;
+            btnSubmit.innerHTML = `<span class="flex items-center"><i data-lucide="plus-circle" class="w-4 h-4"></i></span><span>기록 남기기</span>`;
             btnCancelEdit.classList.add('hidden');
             lucide.createIcons();
         }
