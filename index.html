@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>하루기록 - 클라우드 감성 일기장</title>
+    <title>하루기록 - 완벽 클라우드 동기화</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Playfair+Display:ital,wght=0,400;0,700;1,400&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -18,102 +18,108 @@
         .font-serif-fancy {
             font-family: 'Playfair Display', 'Noto Sans KR', serif;
         }
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col text-slate-800 antialiased">
+<body class="min-h-screen flex flex-col text-slate-800 antialiased bg-slate-50">
 
-    <!-- 상단 네비게이션 바 -->
-    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 transition-all duration-300">
+    <!-- 상단 헤더 -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100">
         <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md">
+                    <i data-lucide="cloud-lightning" class="w-5 h-5"></i>
                 </div>
                 <div>
                     <h1 class="text-lg font-bold tracking-tight text-slate-900">하루기록</h1>
-                    <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">My Cloud Diary</p>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Realtime Cloud Synced</p>
                 </div>
             </div>
 
-            <!-- Firebase 연동 상태 표시 -->
-            <div class="flex items-center space-x-3">
-                <div id="db-status" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 transition-all">
-                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" id="status-indicator"></span>
-                    <span id="status-text">연결 대기 중</span>
+            <!-- 현재 데이터 보관 위치 표시 배너 -->
+            <div class="flex items-center space-x-2">
+                <div id="sync-badge" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                    <span id="sync-status-text">로컬 임시 저장 중 (캐시 삭제시 날아감)</span>
                 </div>
-                <button id="btn-info" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
-                    <i data-lucide="help-circle" class="w-5 h-5"></i>
-                </button>
             </div>
         </div>
     </header>
 
-    <!-- 메인 레이아웃 -->
     <main class="flex-grow max-w-5xl w-full mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- 왼쪽: 일기 작성 / 수정 폼 (5 cols) -->
+        <!-- 왼쪽: 원인 진단 및 입력 폼 (5 cols) -->
         <section class="lg:col-span-5 space-y-6">
-            <!-- ⚠️ 상세 에러 추적 전용 배너 (문제가 생기면 여기에 에러 코드가 직관적으로 노출됩니다) -->
-            <div id="error-diagnose-card" class="hidden bg-rose-50 border border-rose-200 rounded-2xl p-5 shadow-sm space-y-3">
-                <div class="flex items-start space-x-3">
-                    <div class="p-2 bg-rose-100 rounded-lg text-rose-600 shrink-0">
-                        <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+            
+            <!-- ⚡ 정밀 동기화 모니터링 및 자가 진단 패널 -->
+            <div class="bg-slate-900 text-white rounded-2xl p-5 shadow-xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h3 class="font-bold text-sm text-indigo-400 flex items-center space-x-1.5">
+                        <i data-lucide="cpu" class="w-4 h-4"></i>
+                        <span>Firebase 클라우드 실시간 모니터</span>
+                    </h3>
+                    <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">DEBUG MODE</span>
+                </div>
+                
+                <!-- 점검 단계 목록 -->
+                <div class="space-y-3 text-xs">
+                    <!-- 단계 1: Config 입력 여부 -->
+                    <div class="flex items-center justify-between" id="chk-config">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="circle-dashed" class="w-4 h-4 text-slate-500 step-icon"></i>
+                            <span class="text-slate-300">1. 코드 내 Config 입력 상태</span>
+                        </div>
+                        <span class="font-mono text-[11px] text-slate-400 step-status">대기 중</span>
                     </div>
-                    <div class="space-y-1">
-                        <h3 class="font-bold text-rose-900 text-sm">연결 장애가 진단되었습니다</h3>
-                        <p class="text-xs text-rose-700 leading-relaxed">
-                            연동 과정에서 아래와 같은 Firebase 에러가 검출되었습니다. 원인에 맞는 설정을 검토해 주세요.
-                        </p>
-                        <div class="mt-2 bg-white/90 p-2.5 rounded-lg border border-rose-100 font-mono text-[11px] text-rose-600 break-all" id="diagnose-error-text">
-                            에러 대기 중...
+
+                    <!-- 단계 2: Firebase 앱 초기화 -->
+                    <div class="flex items-center justify-between" id="chk-init">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="circle-dashed" class="w-4 h-4 text-slate-500 step-icon"></i>
+                            <span class="text-slate-300">2. Firebase SDK 초기화</span>
+                        </div>
+                        <span class="font-mono text-[11px] text-slate-400 step-status">대기 중</span>
+                    </div>
+
+                    <!-- 단계 3: 익명 로그인 인증 -->
+                    <div class="flex items-center justify-between" id="chk-auth">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="circle-dashed" class="w-4 h-4 text-slate-500 step-icon"></i>
+                            <span class="text-slate-300">3. Authentication 인증 획득</span>
+                        </div>
+                        <span class="font-mono text-[11px] text-slate-400 step-status">대기 중</span>
+                    </div>
+
+                    <!-- 단계 4: 데이터베이스 쓰기/읽기 권한 -->
+                    <div class="flex items-center justify-between" id="chk-db">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="circle-dashed" class="w-4 h-4 text-slate-500 step-icon"></i>
+                            <span class="text-slate-300">4. Firestore 데이터 접속 (규칙)</span>
+                        </div>
+                        <span class="font-mono text-[11px] text-slate-400 step-status">대기 중</span>
+                    </div>
+                </div>
+
+                <!-- 🚨 검출된 에러 및 해결방법 지시등 -->
+                <div id="diagnose-box" class="hidden pt-3 border-t border-slate-800 text-xs text-rose-300 bg-rose-950/30 p-3 rounded-lg border border-rose-900/50">
+                    <div class="flex items-start space-x-2">
+                        <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 text-rose-400 mt-0.5"></i>
+                        <div class="space-y-1">
+                            <p class="font-bold text-rose-200" id="diagnose-summary">에러가 검출되었습니다</p>
+                            <p class="text-[11px] text-slate-400 font-mono break-all leading-tight" id="diagnose-raw-err"></p>
+                            <div class="text-slate-200 mt-2 p-2 bg-slate-950 rounded border border-slate-800 text-[11px] leading-relaxed" id="diagnose-guide">
+                                해결책 가이드라인이 표시됩니다.
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div id="diagnose-guide-text" class="text-xs text-rose-800 bg-white/50 p-3 rounded-lg border border-rose-100/50 leading-relaxed space-y-1">
-                    <!-- 맞춤 안내 메시지가 여기에 출력됩니다 -->
-                </div>
             </div>
 
-            <!-- 기본 가이드 배너 -->
-            <div id="config-alert" class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 shadow-sm space-y-3">
-                <div class="flex items-start space-x-3">
-                    <div class="p-2 bg-indigo-100 rounded-lg text-indigo-600 shrink-0">
-                        <i data-lucide="database" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-sm">설정파일(config) 값 적용 필수</h3>
-                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                            HTML 파일 하단의 <code>firebaseConfig</code> 객체 내부에 본인의 Firebase 프로젝트 키값을 실제 붙여넣으셨는지 꼭 확인해 주세요! 키값이 비어있으면 데이터가 클라우드로 가지 않습니다.
-                        </p>
-                    </div>
-                </div>
-                <div class="pt-2 border-t border-indigo-100 flex justify-end">
-                    <button onclick="toggleConfigModal(true)" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors flex items-center space-x-1">
-                        <span>프로젝트 설정 가이드 열기</span>
-                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- 일기 작성/수정 카드 -->
-            <div class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm sticky top-24">
+            <!-- 일기 작성 폼 -->
+            <div class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center space-x-2">
-                        <span class="p-1.5 bg-rose-50 text-rose-500 rounded-lg" id="form-icon-box">
-                            <i data-lucide="pen-tool" class="w-4 h-4" id="form-icon"></i>
+                        <span class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
+                            <i data-lucide="pen-tool" class="w-4 h-4"></i>
                         </span>
                         <h2 class="font-bold text-slate-900" id="form-title">오늘의 기록</h2>
                     </div>
@@ -126,13 +132,11 @@
                 <form id="diary-form" class="space-y-4">
                     <input type="hidden" id="entry-id">
                     
-                    <!-- 일자 선택 -->
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">날짜</label>
                         <input type="date" id="diary-date" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-slate-700 text-sm">
                     </div>
 
-                    <!-- 기분 선택 -->
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">오늘의 기분</label>
                         <div class="grid grid-cols-5 gap-2">
@@ -164,19 +168,16 @@
                         </div>
                     </div>
 
-                    <!-- 제목 -->
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">제목</label>
-                        <input type="text" id="diary-title" required placeholder="오늘 하루를 한 단어로 표현한다면?" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-slate-700 text-sm">
+                        <input type="text" id="diary-title" required placeholder="오늘 하루를 요약해보세요" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-slate-700 text-sm">
                     </div>
 
-                    <!-- 내용 -->
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">내용</label>
-                        <textarea id="diary-content" required rows="6" placeholder="기억하고 싶은 순간, 생각, 느꼈던 감정들을 편하게 적어보세요..." class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-slate-700 text-sm leading-relaxed resize-none"></textarea>
+                        <textarea id="diary-content" required rows="5" placeholder="솔직한 생각과 기억하고 싶은 일들을 적어보세요..." class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-slate-700 text-sm leading-relaxed resize-none"></textarea>
                     </div>
 
-                    <!-- 등록 버튼 -->
                     <button type="submit" id="btn-submit" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-medium text-sm transition-all duration-150 flex items-center justify-center space-x-2 shadow-sm">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i>
                         <span>기록 남기기</span>
@@ -187,17 +188,17 @@
 
         <!-- 오른쪽: 기록 리스트 (7 cols) -->
         <section class="lg:col-span-7 space-y-6">
-            <!-- 필터 및 검색 컨트롤러 -->
+            <!-- 검색 / 필터바 -->
             <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="relative flex-grow">
                     <span class="absolute left-3.5 top-2.5 text-slate-400">
                         <i data-lucide="search" class="w-4 h-4"></i>
                     </span>
-                    <input type="text" id="search-input" placeholder="기록 제목이나 내용 검색..." class="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 rounded-xl border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all">
+                    <input type="text" id="search-input" placeholder="일기 검색..." class="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 rounded-xl border-none outline-none focus:ring-2 focus:ring-indigo-100 transition-all">
                 </div>
                 
                 <div class="flex items-center space-x-2 shrink-0">
-                    <select id="filter-mood" class="px-3 py-2 bg-slate-50 border-none rounded-xl text-xs font-medium text-slate-600 outline-none focus:ring-2 focus:ring-indigo-100 transition-all">
+                    <select id="filter-mood" class="px-3 py-2 bg-slate-50 border-none rounded-xl text-xs font-medium text-slate-600 outline-none">
                         <option value="all">모든 기분</option>
                         <option value="😊">😊 좋음</option>
                         <option value="🥰">🥰 기쁨</option>
@@ -206,154 +207,106 @@
                         <option value="🔥">🔥 열정</option>
                     </select>
 
-                    <select id="sort-order" class="px-3 py-2 bg-slate-50 border-none rounded-xl text-xs font-medium text-slate-600 outline-none focus:ring-2 focus:ring-indigo-100 transition-all">
+                    <select id="sort-order" class="px-3 py-2 bg-slate-50 border-none rounded-xl text-xs font-medium text-slate-600 outline-none">
                         <option value="desc">최신순</option>
                         <option value="asc">과거순</option>
                     </select>
                 </div>
             </div>
 
-            <!-- 일기 카드 영역 -->
+            <!-- 일기 표시 리스트 -->
             <div id="diary-list-container" class="space-y-4">
-                <!-- 로딩 스켈레톤 -->
-                <div id="list-loader" class="space-y-4">
-                    <div class="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm animate-pulse space-y-3">
-                        <div class="h-4 bg-slate-100 rounded w-1/4"></div>
-                        <div class="h-6 bg-slate-100 rounded w-3/4"></div>
-                        <div class="h-4 bg-slate-100 rounded w-full"></div>
-                    </div>
+                <div id="list-loader" class="hidden text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent"></div>
+                    <p class="text-xs text-slate-400 mt-2">클라우드 일기 동기화 중...</p>
                 </div>
 
-                <!-- 일기가 없을 때 출력되는 Empty State -->
                 <div id="empty-state" class="hidden py-20 text-center flex flex-col items-center justify-center">
                     <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-4">
-                        <i data-lucide="feather" class="w-8 h-8"></i>
+                        <i data-lucide="book-heart" class="w-8 h-8"></i>
                     </div>
-                    <h3 class="font-bold text-slate-700 text-base">아직 기록된 하루가 없습니다</h3>
-                    <p class="text-sm text-slate-400 mt-1 max-w-xs mx-auto">Firebase 연동 완료 시 이곳에 실시간으로 일기가 저장 및 동기화됩니다.</p>
+                    <h3 class="font-bold text-slate-700 text-base">저장된 기록이 없습니다</h3>
+                    <p class="text-sm text-slate-400 mt-1 max-w-xs mx-auto">실시간 클라우드가 켜지면 브라우저 캐시를 삭제해도 일기가 안전하게 유지됩니다!</p>
                 </div>
 
-                <!-- 실제 일기 목록이 렌더링될 영역 -->
                 <div id="diary-items" class="space-y-4"></div>
             </div>
         </section>
     </main>
 
-    <!-- 사용자 피드백 토스트 알림 -->
-    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-950/95 text-white text-xs font-semibold py-3 px-6 rounded-full shadow-2xl opacity-0 translate-y-4 transition-all duration-300 pointer-events-none z-50 flex items-center space-x-2">
+    <!-- 사용자 알림 토스트 -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs font-semibold py-3 px-6 rounded-full shadow-2xl opacity-0 translate-y-4 transition-all duration-300 pointer-events-none z-50 flex items-center space-x-2">
         <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i>
-        <span id="toast-message">알림 메시지</span>
-    </div>
-
-    <!-- Firebase 설정 안내 모달 -->
-    <div id="info-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
-        <div class="bg-white rounded-2xl max-w-lg w-full mx-4 p-6 shadow-2xl relative border border-slate-100 max-h-[90vh] overflow-y-auto">
-            <button onclick="toggleConfigModal(false)" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-            <div class="flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                    <i data-lucide="shield-alert" class="w-5 h-5"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-900">클라우드 연동 가이드</h3>
-            </div>
-            
-            <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
-                <div>
-                    <span class="inline-block px-2 py-0.5 bg-indigo-50 text-indigo-600 font-bold rounded text-xs mb-1">STEP 1</span>
-                    <p class="text-xs">HTML 소스코드 하단의 <code>const firebaseConfig</code> 구역에 Firebase 프로젝트 콘솔에서 발급한 앱 구성 데이터(API 키 등)를 정확하게 삽입했는지 확인해 주세요.</p>
-                </div>
-                <hr class="border-slate-100">
-                <div>
-                    <span class="inline-block px-2 py-0.5 bg-rose-50 text-rose-600 font-bold rounded text-xs mb-1">STEP 2 (중요)</span>
-                    <p class="text-xs mb-1">Firestore Database 메뉴의 <b>규칙(Rules)</b>이 아래 구조와 다르게 기본값(false)으로 설정되어 있다면, 아래 내용으로 바꿔서 <b>[게시]</b> 버튼을 눌러주셔야 쓰기 권한이 허용됩니다.</p>
-                    <pre class="bg-slate-50 p-2.5 rounded border border-slate-200 overflow-x-auto text-[10px] font-mono text-slate-700">
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /artifacts/{appId}/users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}</pre>
-                </div>
-                <hr class="border-slate-100">
-                <div>
-                    <span class="inline-block px-2 py-0.5 bg-amber-50 text-amber-600 font-bold rounded text-xs mb-1">STEP 3</span>
-                    <p class="text-xs">Authentication -> Sign-in method 탭 -> <b>익명(Anonymous)</b> 로그인이 활성화되어 있어야 에러가 나지 않고 인증 키를 받아올 수 있습니다.</p>
-                </div>
-            </div>
-            <div class="mt-6 flex justify-end">
-                <button onclick="toggleConfigModal(false)" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition-colors">
-                    확인했습니다
-                </button>
-            </div>
-        </div>
+        <span id="toast-message">메시지</span>
     </div>
 
     <!-- 하단 푸터 -->
-    <footer class="bg-white border-t border-slate-100 py-6 text-center text-xs text-slate-400">
-        <p>© 2026 하루기록. Cloud Mode Backed with Firebase Firestore.</p>
+    <footer class="bg-white border-t border-slate-100 py-6 text-center text-xs text-slate-400 mt-auto">
+        <p>© 2026 하루기록. Cloud Synced Tracker.</p>
     </footer>
 
-    <!-- Firebase SDK 모듈 로드 -->
+    <!-- Firebase SDK 로더 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // =======================================================
-        // ⚠️ [필수 확인 및 작성!] 여기에 본인의 실제 Firebase 설정값을 넣어주세요!
-        // =======================================================
-          const firebaseConfig = {
-    apiKey: "AIzaSyDr85jrNxwMfLzO-XjJYgo3CWGpoyxmvmM",
-    authDomain: "test-7d850.firebaseapp.com",
-    projectId: "test-7d850",
-    storageBucket: "test-7d850.firebasestorage.app",
-    messagingSenderId: "440314204113",
-    appId: "1:440314204113:web:eee03ea11493c8f9e6daf0",
-    measurementId: "G-CNMLWQB0YE"
-  };
-        // 전역 상태 변수
-        let db;
-        let auth;
+        // =============================================================
+        // ⚠️ [중요] 여기에 본인의 Firebase 설정값(Config)을 복사해서 붙여넣어 주세요!
+        // =============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDr85jrNxwMfLzO-XjJYgo3CWGpoyxmvmM",
+            authDomain: "test-7d850.firebaseapp.com",
+            projectId: "test-7d850",
+            storageBucket: "test-7d850.firebasestorage.app",
+            messagingSenderId: "440314204113",
+            appId: "1:440314204113:web:eee03ea11493c8f9e6daf0"
+        };
+
+        // 전역 상태 관리
+        let db = null;
+        let auth = null;
         let currentUser = null;
         let isFirebaseActive = false;
-        let allDiaryEntries = [];
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'diary-app-prod';
+        let allEntries = [];
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'cloud-diary-diagnose';
 
-        // UI 엘리먼트 정의
+        // UI 바인딩
+        const syncBadge = document.getElementById('sync-badge');
+        const syncStatusText = document.getElementById('sync-status-text');
+        
         const diaryForm = document.getElementById('diary-form');
         const entryIdInput = document.getElementById('entry-id');
         const diaryDateInput = document.getElementById('diary-date');
         const diaryTitleInput = document.getElementById('diary-title');
         const diaryContentInput = document.getElementById('diary-content');
-        const btnSubmit = document.getElementById('btn-submit');
-        const btnCancelEdit = document.getElementById('btn-cancel-edit');
-        const formTitle = document.getElementById('form-title');
-        const formIcon = document.getElementById('form-icon');
-        const formIconBox = document.getElementById('form-icon-box');
         
         const diaryItemsContainer = document.getElementById('diary-items');
-        const listLoader = document.getElementById('list-loader');
         const emptyState = document.getElementById('empty-state');
+        const listLoader = document.getElementById('list-loader');
+        
         const searchInput = document.getElementById('search-input');
         const filterMood = document.getElementById('filter-mood');
         const sortOrder = document.getElementById('sort-order');
-        const configAlert = document.getElementById('config-alert');
         
-        const errorDiagnoseCard = document.getElementById('error-diagnose-card');
-        const diagnoseErrorText = document.getElementById('diagnose-error-text');
-        const diagnoseGuideText = document.getElementById('diagnose-guide-text');
+        const btnSubmit = document.getElementById('btn-submit');
+        const btnCancelEdit = document.getElementById('btn-cancel-edit');
+        const formTitle = document.getElementById('form-title');
 
-        // 초기 안내용 가상 로컬 더미 데이터
-        let localDummyDatabase = [
+        // 자가진단 패널 바인딩
+        const diagnoseBox = document.getElementById('diagnose-box');
+        const diagnoseSummary = document.getElementById('diagnose-summary');
+        const diagnoseRawErr = document.getElementById('diagnose-raw-err');
+        const diagnoseGuide = document.getElementById('diagnose-guide');
+
+        // 기본 로컬 메모리 임시 저장 데이터 (Firebase가 실패하면 여기에만 보관되어 캐시 삭제 시 사라짐)
+        let localTempStorage = [
             {
-                id: 'dummy-info-card',
+                id: 'local-warning-demo',
                 date: new Date().toISOString().split('T')[0],
-                mood: '💡',
-                title: '연동을 완료하기 전 임시 모드입니다',
-                content: 'Firebase 연동 전까지 작동하는 오프라인 가상 모드입니다.\n\n이 상태에서 작성하는 일기는 임시 저장되며, 하단 설정의 firebaseConfig 객체에 유효한 정보가 입력되고 익명 로그인이 완료되면 데이터가 완벽하게 클라우드(Firestore)로 저장 및 실시간 동기화되기 시작합니다.',
+                mood: '⚠️',
+                title: '현재 로컬 임시 모드 상태입니다!',
+                content: 'Firebase 연동 테스트가 실패하거나 진행되지 않아 브라우저 메모리에만 일기가 저장되고 있습니다.\n\n이 상태에서는 브라우저의 인터넷 방문 기록(캐시)을 삭제하거나 시크릿 모드를 닫으면 작성한 일기가 모두 영구 소실됩니다. \n\n연동을 완벽히 마치려면 왼쪽 "Firebase 클라우드 실시간 모니터" 자가진단 항목의 체크표시가 전부 녹색으로 완료되도록 설정을 변경해 주어야 합니다.',
                 createdAt: Date.now()
             }
         ];
@@ -361,9 +314,10 @@ service cloud.firestore {
         window.addEventListener('DOMContentLoaded', () => {
             diaryDateInput.value = new Date().toISOString().split('T')[0];
             setupMoodSelector();
-            checkAndInitFirebase();
+            runFirebaseDiagnosticFlow();
         });
 
+        // 감정 선택자 애니메이션
         function setupMoodSelector() {
             const options = document.querySelectorAll('.mood-option');
             options.forEach(opt => {
@@ -383,148 +337,209 @@ service cloud.firestore {
             });
         }
 
-        // Firebase 연동 상태 진단 및 이니셜라이즈
-        async function checkAndInitFirebase() {
-            const isConfigValid = firebaseConfig.apiKey && firebaseConfig.apiKey.trim() !== "" && firebaseConfig.projectId.trim() !== "";
+        // ⚡ 핵심: Firebase 클라우드 연결 4단계 자가진단 워크플로우
+        async function runFirebaseDiagnosticFlow() {
+            // [1단계] Config 입력 여부 점검
+            const step1 = document.getElementById('chk-config');
+            const hasConfig = firebaseConfig.apiKey && firebaseConfig.apiKey.trim() !== "" && firebaseConfig.projectId.trim() !== "";
+            
+            if (!hasConfig) {
+                markStep(step1, 'fail', '미작성');
+                showDiagnosticError(
+                    '1단계 에러: 설정 파일 정보 누락',
+                    'firebaseConfig 객체에 내용이 적혀있지 않습니다.',
+                    `<strong>해결방법:</strong><br>
+                    1. <a href="https://console.firebase.google.com/" target="_blank" class="text-indigo-400 underline font-semibold">Firebase 콘솔</a>에 접속합니다.<br>
+                    2. 내 프로젝트 선택 -> 왼쪽 위 ⚙️(설정) -> <strong>프로젝트 설정</strong> 클릭.<br>
+                    3. 하단 '내 앱' 섹션에서 코드블럭 형태의 <strong>firebaseConfig</strong> 정보를 복사해서 코드 아래쪽 <code>firebaseConfig = { ... }</code> 구역 안에 정확히 복사해 넣으세요.`
+                );
+                fallbackToLocalMode();
+                return;
+            }
+            markStep(step1, 'success', '확인됨');
 
-            if (!isConfigValid) {
-                diagnoseAppError("CONFIG_MISSING", "소스코드 내부의 'firebaseConfig' 설정값이 완전히 비어 있습니다.");
-                fallbackToLocal("설정값 없음");
+            // [2단계] Firebase 앱 초기화 점검
+            const step2 = document.getElementById('chk-init');
+            let app;
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                markStep(step2, 'success', '성공');
+            } catch (err) {
+                markStep(step2, 'fail', '오류');
+                showDiagnosticError(
+                    '2단계 에러: SDK 초기화 실패',
+                    err.message,
+                    `<strong>해결방법:</strong><br>
+                    입력하신 <code>firebaseConfig</code> 구조에 오탈자나 빠진 콤마(,)가 있는지 코드를 한 번 더 검토해 주세요. API 포트 혹은 라이브러리 차단 이슈일 수 있습니다.`
+                );
+                fallbackToLocalMode();
                 return;
             }
 
+            // [3단계] Authentication 인증 권한 체크 (로그인)
+            const step3 = document.getElementById('chk-auth');
             try {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
+                markStep(step3, 'loading', '인증 시도 중...');
+                
+                // 익명 로그인 규칙 강제
+                const authResult = await signInAnonymously(auth);
+                currentUser = authResult.user;
+                
+                markStep(step3, 'success', '익명로그인 성공');
+            } catch (err) {
+                markStep(step3, 'fail', '인증 차단됨');
+                showDiagnosticError(
+                    '3단계 에러: Authentication 익명 로그인 비활성화',
+                    err.code || err.message,
+                    `<strong>해결방법: (이 단계에서 가장 많이 막힙니다!)</strong><br>
+                    1. Firebase 콘솔 왼쪽 메뉴에서 <strong>Build(빌드) -> Authentication</strong> 메뉴로 이동합니다.<br>
+                    2. <strong>Sign-in method</strong> 탭을 누릅니다.<br>
+                    3. '새 제공업체 추가' 혹은 목록에 있는 <strong>'익명 (Anonymous)'</strong>을 클릭합니다.<br>
+                    4. 우측 토글을 <span class="text-emerald-400 font-bold">사용 설정 (Enabled)</span>로 활성화 한 후 <strong>[저장]</strong> 버튼을 누릅니다.`
+                );
+                fallbackToLocalMode();
+                return;
+            }
 
-                // 익명 로그인 시도 (규칙 우회 목적)
-                await signInAnonymously(auth);
+            // [4단계] 데이터베이스 연결 및 규칙 점검 (가장 중요)
+            const step4 = document.getElementById('chk-db');
+            try {
+                markStep(step4, 'loading', '규칙 테스트 중...');
+                
+                if (!currentUser) throw new Error("인증 사용자 데이터 유실됨");
 
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        currentUser = user;
-                        isFirebaseActive = true;
-                        configAlert.classList.add('hidden');
-                        errorDiagnoseCard.classList.add('hidden');
-                        updateStatusBadge(true);
-                        subscribeToDiaryEntries(user.uid);
-                    } else {
-                        fallbackToLocal("유저가 존재하지 않음");
-                    }
-                });
-
-            } catch (error) {
-                console.error("Firebase 초기화 중 에러 발생:", error);
-                diagnoseAppError(error.code || "INIT_FAIL", error.message);
-                fallbackToLocal(error.message);
+                // 실시간 데이터베이스 마운트 리스너 연결
+                subscribeToFirestore(currentUser.uid);
+                
+            } catch (err) {
+                markStep(step4, 'fail', '읽기/쓰기 거부');
+                handleDbPermissionError(err);
+                fallbackToLocalMode();
             }
         }
 
-        // 에러 정밀 분석을 통한 실시간 진단 가이드 표출 시스템
-        function diagnoseAppError(code, rawMsg) {
-            errorDiagnoseCard.classList.remove('hidden');
-            diagnoseErrorText.innerText = `[에러 코드: ${code}]\n${rawMsg}`;
-            
-            let guideHtml = '';
-            
-            if (code === 'CONFIG_MISSING') {
-                guideHtml = `
-                    <p class="font-semibold">💡 해결책:</p>
-                    <p>현재 코드에 Firebase 설정값이 전혀 입력되어 있지 않습니다. Firebase 콘솔의 <b>'프로젝트 설정'</b>에서 config 객체를 찾은 뒤, 소스코드 최하단에 있는 <code>firebaseConfig</code> 변수 안에 올바르게 채워 넣어 주세요.</p>
-                `;
-            } else if (code.includes('auth/operation-not-allowed')) {
-                guideHtml = `
-                    <p class="font-semibold">💡 해결책: 익명 로그인 비활성화 에러</p>
-                    <p class="mt-1">Firebase Authentication 메뉴의 <b>[Sign-in method]</b> 설정에서 <b>익명(Anonymous)</b> 항목을 반드시 '사용 설정(Enable)'으로 변경하고 저장하셔야 정상 이용 가능합니다.</p>
-                `;
-            } else if (code.includes('permission-denied') || rawMsg.toLowerCase().includes('permission')) {
-                guideHtml = `
-                    <p class="font-semibold">💡 해결책: 데이터베이스 접근 권한 없음</p>
-                    <p class="mt-1">Firestore Database의 <b>[규칙(Rules)]</b> 탭으로 이동하신 후, 모든 읽기/쓰기를 막는 기본 규칙을 지우고 안내 모달에 적힌 보안 규칙 가이드 코드로 바꾼 뒤 꼭 <b>[게시]</b> 버튼을 눌러주세요.</p>
-                `;
-            } else if (code.includes('auth/invalid-api-key') || code.includes('auth/network-error') || rawMsg.includes('API key')) {
-                guideHtml = `
-                    <p class="font-semibold">💡 해결책: 잘못된 API 키값 또는 네트워크 통신 불가</p>
-                    <p class="mt-1">입력하신 <code>apiKey</code> 값이 Firebase 콘솔에 적혀있는 값과 정확히 일치하는지 확인해 주세요. 오타나 불필요한 공백이 있을 수 있습니다.</p>
-                `;
-            } else {
-                guideHtml = `
-                    <p class="font-semibold">💡 예상 해결책:</p>
-                    <p class="mt-1">기타 에러가 발생한 경우, 주로 1) 익명로그인 체크, 2) Firestore의 규칙 변경(모든 접근 차단 풀기)을 누락하여 발생하는 경우가 대다수입니다. 콘솔을 다시 한번 점검해 보세요.</p>
-                `;
-            }
-            diagnoseGuideText.innerHTML = guideHtml;
-            lucide.createIcons();
-        }
-
-        function fallbackToLocal(reason) {
-            isFirebaseActive = false;
-            configAlert.classList.remove('hidden');
-            updateStatusBadge(false);
-            allDiaryEntries = [...localDummyDatabase];
-            renderDiaryList();
-        }
-
-        function updateStatusBadge(active) {
-            const statusIndicator = document.getElementById('status-indicator');
-            const statusText = document.getElementById('status-text');
-            const dbStatus = document.getElementById('db-status');
-
-            if (active) {
-                statusIndicator.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-                statusText.innerText = "실시간 연결됨";
-                dbStatus.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 transition-all";
-            } else {
-                statusIndicator.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
-                statusText.innerText = "로컬 모드 (저장 대기)";
-                dbStatus.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 transition-all";
-            }
-        }
-
-        // Firestore 실시간 데이터 구독 리스너
-        function subscribeToDiaryEntries(userId) {
+        // Firestore 실시간 채널 구독
+        function subscribeToFirestore(userId) {
+            const step4 = document.getElementById('chk-db');
             listLoader.classList.remove('hidden');
-            
+
             const collectionRef = collection(db, 'artifacts', appId, 'users', userId, 'diaries');
-            
+
             onSnapshot(collectionRef, (snapshot) => {
                 const entries = [];
                 snapshot.forEach((doc) => {
                     entries.push({ id: doc.id, ...doc.data() });
                 });
+
+                allEntries = entries;
+                isFirebaseActive = true;
                 
-                allDiaryEntries = entries;
+                // 완벽한 클라우드 모드로 변환 성공!
+                markStep(step4, 'success', '동기화 완료');
+                diagnoseBox.classList.add('hidden'); // 에러상자 제거
+                
+                // 배너 정보 변경
+                syncBadge.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200";
+                syncStatusText.innerText = "☁️ 클라우드 완벽 실시간 동기화 중 (캐시를 삭제해도 영구 유지)";
+                
                 renderDiaryList();
-                lucide.createIcons();
             }, (error) => {
-                console.error("Firestore 실시간 데이터 구독 에러:", error);
-                diagnoseAppError(error.code || "DB_READ_DENIED", error.message);
-                fallbackToLocal("접근 권한 누락");
+                console.error("Firestore 실시간 데이터 로드 실패:", error);
+                markStep(step4, 'fail', '접근 차단');
+                handleDbPermissionError(error);
+                fallbackToLocalMode();
             });
         }
 
-        // 일기 목록 UI 그리기
+        // 데이터베이스 규칙 거부 에러 분석
+        function handleDbPermissionError(error) {
+            showDiagnosticError(
+                '4단계 에러: Cloud Firestore 데이터베이스 보안 규칙 차단',
+                error.code || error.message,
+                `<strong>해결방법: (데이터베이스 읽기/쓰기가 완전히 차단된 상태입니다)</strong><br>
+                1. Firebase 콘솔 왼쪽 메뉴에서 <strong>Build(빌드) -> Firestore Database</strong>로 이동합니다.<br>
+                2. 상단의 <strong>[규칙 (Rules)]</strong> 탭을 클릭합니다.<br>
+                3. 기본적으로 적혀있는 규칙 전체를 지우고 아래 규칙을 복사해서 붙여넣으세요.<br>
+                <pre class="bg-slate-950 p-2 mt-2 rounded border border-slate-800 text-[10px] text-indigo-300 font-mono overflow-x-auto">
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /artifacts/{appId}/users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}</pre>
+                4. 붙여넣은 뒤 우측 상단의 <strong class="text-indigo-400">[게시 (Publish)]</strong> 버튼을 반드시 눌러서 반영해 주셔야 실시간 저장이 시작됩니다!`
+            );
+        }
+
+        // 자가진단 각 단계 UI 상태 세팅
+        function markStep(element, status, text) {
+            const icon = element.querySelector('.step-icon');
+            const statusLabel = element.querySelector('.step-status');
+            
+            if (status === 'success') {
+                icon.className = "w-4 h-4 text-emerald-500 step-icon";
+                icon.setAttribute('data-lucide', 'check-circle-2');
+                statusLabel.className = "font-bold text-[11px] text-emerald-400 step-status";
+                statusLabel.innerText = text;
+            } else if (status === 'fail') {
+                icon.className = "w-4 h-4 text-rose-500 step-icon";
+                icon.setAttribute('data-lucide', 'x-circle');
+                statusLabel.className = "font-bold text-[11px] text-rose-500 step-status";
+                statusLabel.innerText = text;
+            } else if (status === 'loading') {
+                icon.className = "w-4 h-4 text-amber-500 animate-spin step-icon";
+                icon.setAttribute('data-lucide', 'loader-2');
+                statusLabel.className = "font-bold text-[11px] text-amber-400 step-status";
+                statusLabel.innerText = text;
+            }
+            lucide.createIcons();
+        }
+
+        // 실시간 진단창 노출
+        function showDiagnosticError(summary, raw, guide) {
+            diagnoseBox.classList.remove('hidden');
+            diagnoseSummary.innerText = summary;
+            diagnoseRawErr.innerText = `Raw Error: ${raw}`;
+            diagnoseGuide.innerHTML = guide;
+            lucide.createIcons();
+        }
+
+        // 에러 발생시 로컬 임시 메모리 저장소로 격하 작동
+        function fallbackToLocalMode() {
+            isFirebaseActive = false;
+            syncBadge.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 animate-pulse";
+            syncStatusText.innerText = "🚨 오프라인 모드 (저장 불가/캐시 삭제시 삭제됨)";
+            
+            allEntries = [...localTempStorage];
+            renderDiaryList();
+        }
+
+        // 일기장 목록 렌더링 함수
         function renderDiaryList() {
             listLoader.classList.add('hidden');
             diaryItemsContainer.innerHTML = '';
 
             const searchTerm = searchInput.value.toLowerCase().trim();
-            const moodFilter = filterMood.value;
-            const sortMode = sortOrder.value;
+            const moodValue = filterMood.value;
+            const sortVal = sortOrder.value;
 
-            let filtered = allDiaryEntries.filter(entry => {
-                const matchesSearch = entry.title.toLowerCase().includes(searchTerm) || 
-                                      entry.content.toLowerCase().includes(searchTerm);
-                const matchesMood = moodFilter === 'all' || entry.mood === moodFilter;
-                return matchesSearch && matchesMood;
+            let filtered = allEntries.filter(entry => {
+                const searchMatch = entry.title.toLowerCase().includes(searchTerm) || 
+                                    entry.content.toLowerCase().includes(searchTerm);
+                const moodMatch = moodValue === 'all' || entry.mood === moodValue;
+                return searchMatch && moodMatch;
             });
 
+            // 정렬
             filtered.sort((a, b) => {
                 if (a.date === b.date) {
-                    return sortMode === 'desc' ? b.createdAt - a.createdAt : a.createdAt - b.createdAt;
+                    return sortVal === 'desc' ? b.createdAt - a.createdAt : a.createdAt - b.createdAt;
                 }
-                return sortMode === 'desc' 
+                return sortVal === 'desc' 
                     ? new Date(b.date) - new Date(a.date) 
                     : new Date(a.date) - new Date(b.date);
             });
@@ -538,19 +553,18 @@ service cloud.firestore {
 
             filtered.forEach(entry => {
                 const card = document.createElement('article');
-                card.className = "bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-200 group relative overflow-hidden";
-                card.id = `entry-card-${entry.id}`;
-
+                card.className = "bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-200 group relative";
+                
                 const dateObj = new Date(entry.date);
-                const weekday = ["일", "월", "화", "수", "목", "금", "토"][dateObj.getDay()];
-                const dateString = `${dateObj.getFullYear()}. ${String(dateObj.getMonth() + 1).padStart(2, '0')}. ${String(dateObj.getDate()).padStart(2, '0')}. (${weekday})`;
+                const days = ["일", "월", "화", "수", "목", "금", "토"];
+                const dateText = `${dateObj.getFullYear()}. ${String(dateObj.getMonth() + 1).padStart(2, '0')}. ${String(dateObj.getDate()).padStart(2, '0')}. (${days[dateObj.getDay()]})`;
 
                 card.innerHTML = `
                     <div class="flex items-start justify-between mb-3">
-                        <div class="flex items-center space-x-2.5">
+                        <div class="flex items-center space-x-3">
                             <span class="text-3xl filter drop-shadow-sm">${entry.mood || '😊'}</span>
                             <div>
-                                <time class="text-xs font-semibold text-slate-400 tracking-wider">${dateString}</time>
+                                <time class="text-xs font-semibold text-slate-400">${dateText}</time>
                                 <h3 class="font-bold text-slate-800 text-base mt-0.5 group-hover:text-indigo-600 transition-colors">${escapeHtml(entry.title)}</h3>
                             </div>
                         </div>
@@ -563,9 +577,8 @@ service cloud.firestore {
                             </button>
                         </div>
                     </div>
-                    <p class="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap font-sans pl-1 border-l-2 border-slate-100 group-hover:border-indigo-100 transition-all">${escapeHtml(entry.content)}</p>
+                    <p class="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap pl-1.5 border-l-2 border-slate-100 group-hover:border-indigo-100 transition-all">${escapeHtml(entry.content)}</p>
                 `;
-
                 diaryItemsContainer.appendChild(card);
             });
 
@@ -582,7 +595,7 @@ service cloud.firestore {
                 .replace(/'/g, "&#039;");
         }
 
-        // 일기 저장 및 수정 프로세스
+        // 일기 저장 및 수정 제출
         diaryForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -593,46 +606,37 @@ service cloud.firestore {
             const mood = document.querySelector('input[name="mood"]:checked').value;
 
             if (!isFirebaseActive) {
-                showToast("현재 로컬 대기 모드입니다. 에러 카드 지침을 확인하여 연동을 완료해 주세요.");
-                toggleConfigModal(true);
+                showToast("⚠️ Firebase 클라우드 연결이 오프라인 상태입니다. 자가진단을 통해 설정을 완료해야 데이터가 영구 보관됩니다.");
                 return;
             }
 
             btnSubmit.disabled = true;
-            btnSubmit.innerHTML = `<span class="animate-spin mr-2"><i data-lucide="loader-2" class="w-4 h-4"></i></span>저장 중...`;
+            btnSubmit.innerHTML = `<span class="animate-spin mr-2"><i data-lucide="loader-2" class="w-4 h-4"></i></span>동기화 중...`;
             lucide.createIcons();
 
             try {
-                if (!currentUser) throw new Error("인증 데이터가 유실되었습니다. 새로고침을 실행해 주세요.");
-                
+                if (!currentUser) throw new Error("인증이 풀렸습니다.");
+
                 if (entryId) {
                     const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'diaries', entryId);
                     await updateDoc(docRef, {
-                        title,
-                        content,
-                        date,
-                        mood,
-                        updatedAt: Date.now()
+                        title, content, date, mood, updatedAt: Date.now()
                     });
-                    showToast("기록이 깔끔하게 수정되었습니다.");
+                    showToast("기록이 수정되어 클라우드에 업데이트되었습니다.");
                 } else {
-                    const userDocRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'diaries');
-                    await addDoc(userDocRef, {
-                        title,
-                        content,
-                        date,
-                        mood,
-                        createdAt: Date.now()
+                    const collectionRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'diaries');
+                    await addDoc(collectionRef, {
+                        title, content, date, mood, createdAt: Date.now()
                     });
-                    showToast("오늘의 순간이 안전하게 동기화되었습니다.");
+                    showToast("오늘의 기록이 안전하게 암호화되어 클라우드에 저장되었습니다.");
                 }
 
                 resetForm();
 
             } catch (err) {
-                console.error("데이터 쓰기 실패 오류:", err);
-                diagnoseAppError(err.code || "WRITE_FAILED", err.message);
-                showToast("저장에 실패했습니다. 화면 왼쪽의 진단 지침을 확인해 주세요.");
+                console.error("저장 실패 에러:", err);
+                showToast("❌ 저장 오류 발생! 자가진단 패널을 참조하세요.");
+                handleDbPermissionError(err);
             } finally {
                 btnSubmit.disabled = false;
                 btnSubmit.innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4"></i><span>기록 남기기</span>`;
@@ -640,32 +644,27 @@ service cloud.firestore {
             }
         });
 
-        // 일기 삭제 프로세스
+        // 일기 삭제
         window.deleteEntry = async function(id) {
-            const confirmed = confirm("이 기록을 영구적으로 삭제하시겠습니까?");
-            if (!confirmed) return;
+            if (!confirm("선택한 일기를 클라우드 데이터베이스에서 완전히 삭제하시겠습니까? (복구 불가능)")) return;
 
             try {
-                if (isFirebaseActive) {
-                    if (!currentUser) return;
+                if (isFirebaseActive && currentUser) {
                     const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'diaries', id);
                     await deleteDoc(docRef);
-                    showToast("기록이 클라우드에서 영구 삭제되었습니다.");
+                    showToast("기록이 데이터베이스에서 영구적으로 삭제되었습니다.");
                 } else {
-                    showToast("로컬 모드 상태에서는 영구 삭제가 되지 않습니다.");
-                }
-                if (entryIdInput.value === id) {
-                    resetForm();
+                    showToast("로컬 모드에서는 완벽한 삭제가 적용되지 않습니다.");
                 }
             } catch (err) {
-                console.error("삭제 실패 에러:", err);
-                showToast("삭제 실행 도중 오류가 발생했습니다.");
+                console.error("삭제 에러:", err);
+                showToast("삭제 실패. 규칙 권한을 재확인하세요.");
             }
         };
 
-        // 수정 기능 로딩
+        // 수정 채우기
         window.editEntry = function(id) {
-            const entry = allDiaryEntries.find(x => x.id === id);
+            const entry = allEntries.find(x => x.id === id);
             if (!entry) return;
 
             entryIdInput.value = entry.id;
@@ -673,16 +672,13 @@ service cloud.firestore {
             diaryContentInput.value = entry.content;
             diaryDateInput.value = entry.date;
 
-            const targetRadio = document.querySelector(`input[name="mood"][value="${entry.mood}"]`);
-            if (targetRadio) {
-                targetRadio.checked = true;
+            const radio = document.querySelector(`input[name="mood"][value="${entry.mood}"]`);
+            if (radio) {
+                radio.checked = true;
                 setupMoodSelector();
             }
 
-            formTitle.innerText = "기록 수정 중";
-            formIconBox.classList.remove('bg-rose-50', 'text-rose-500');
-            formIconBox.classList.add('bg-indigo-50', 'text-indigo-600');
-            formIcon.setAttribute('data-lucide', 'edit-3');
+            formTitle.innerText = "기록 수정하기";
             btnSubmit.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i><span>수정 완료</span>`;
             btnCancelEdit.classList.remove('hidden');
 
@@ -702,12 +698,8 @@ service cloud.firestore {
             setupMoodSelector();
 
             formTitle.innerText = "오늘의 기록";
-            formIconBox.classList.remove('bg-indigo-50', 'text-indigo-600');
-            formIconBox.classList.add('bg-rose-50', 'text-rose-500');
-            formIcon.setAttribute('data-lucide', 'pen-tool');
             btnSubmit.innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4"></i><span>기록 남기기</span>`;
             btnCancelEdit.classList.add('hidden');
-
             lucide.createIcons();
         }
 
@@ -720,7 +712,6 @@ service cloud.firestore {
         function showToast(message) {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-message');
-            
             toastMsg.innerText = message;
             toast.classList.remove('opacity-0', 'translate-y-4');
             toast.classList.add('opacity-100', 'translate-y-0');
@@ -729,22 +720,8 @@ service cloud.firestore {
             toastTimeout = setTimeout(() => {
                 toast.classList.remove('opacity-100', 'translate-y-0');
                 toast.classList.add('opacity-0', 'translate-y-4');
-            }, 3500);
+            }, 3000);
         }
-
-        window.toggleConfigModal = function(show) {
-            const modal = document.getElementById('info-modal');
-            if (show) {
-                modal.classList.remove('opacity-0', 'pointer-events-none');
-                modal.classList.add('opacity-100', 'pointer-events-auto');
-            } else {
-                modal.classList.remove('opacity-100', 'pointer-events-auto');
-                modal.classList.add('opacity-0', 'pointer-events-none');
-            }
-        };
-
-        document.getElementById('btn-info').addEventListener('click', () => toggleConfigModal(true));
-        lucide.createIcons();
     </script>
 </body>
 </html>
